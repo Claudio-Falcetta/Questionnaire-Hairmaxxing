@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hairmaxxing — Questionnaire capillaire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #F7F5F0;
+      --surface: #FFFFFF;
+      --text: #1A1A18;
+      --muted: #6B6B66;
+      --hint: #A8A89E;
+      --border: rgba(26,26,24,0.12);
+      --border-md: rgba(26,26,24,0.22);
+      --border-strong: rgba(26,26,24,0.4);
+      --accent: #1A1A18;
+      --accent-fg: #F7F5F0;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --green-bg: #EBF4E8;
+      --green-text: #2D5A27;
+      --amber-bg: #FBF0DC;
+      --amber-text: #6B4400;
+      --blue-bg: #E8EFF8;
+      --blue-text: #1A3A6B;
+      --red-bg: #FBECE8;
+      --red-text: #6B2015;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .site-header {
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+    .site-header .brand {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.25rem;
+      letter-spacing: -0.01em;
+    }
+    .site-header .module-tag {
+      font-size: 12px;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2px 10px;
+    }
+
+    /* Main layout */
+    .page {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem 6rem;
+    }
+
+    /* Quiz intro */
+    .quiz-intro {
+      margin-bottom: 3rem;
+    }
+    .quiz-intro h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2.25rem;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.75rem;
+    }
+    .quiz-intro h1 em {
+      font-style: italic;
+      color: var(--muted);
+    }
+    .quiz-intro p {
+      font-size: 15px;
+      color: var(--muted);
+      max-width: 480px;
+    }
+
+    /* Progress */
+    .progress-track {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 2.5rem;
+    }
+    .progress-seg {
+      height: 3px;
+      flex: 1;
+      background: var(--border);
+      border-radius: 2px;
+      transition: background 0.3s ease;
+    }
+    .progress-seg.done { background: var(--text); }
+    .progress-seg.active { background: rgba(26,26,24,0.4); }
+
+    /* Step */
+    .step-meta {
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--hint);
+      margin-bottom: 0.6rem;
+      font-weight: 500;
+    }
+    .step-q {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      line-height: 1.25;
+      margin-bottom: 0.5rem;
+    }
+    .step-sub {
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 1.75rem;
+    }
+    .multi-hint {
+      font-size: 12px;
+      color: var(--hint);
+      margin-bottom: 1rem;
+      letter-spacing: 0.03em;
+    }
+
+    /* Options */
+    .options { display: flex; flex-direction: column; gap: 8px; }
+
+    .opt {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 16px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      cursor: pointer;
+      text-align: left;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      transition: border-color 0.15s, background 0.15s, transform 0.1s;
+      width: 100%;
+    }
+    .opt:hover { border-color: var(--border-md); background: #FAFAF8; transform: translateY(-1px); }
+    .opt:active { transform: translateY(0); }
+    .opt.selected {
+      border-color: var(--accent);
+      border-width: 1.5px;
+      background: var(--surface);
+    }
+
+    .opt-marker {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-md);
+      flex-shrink: 0;
+      margin-top: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .opt.selected .opt-marker {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    .opt.selected .opt-marker::after {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent-fg);
+      display: block;
+    }
+
+    .opt.multi .opt-marker { border-radius: 5px; }
+    .opt.multi.selected .opt-marker { background: var(--accent); border-color: var(--accent); }
+    .opt.multi.selected .opt-marker::after {
+      content: '';
+      width: 9px;
+      height: 5px;
+      border-radius: 0;
+      background: transparent;
+      border-left: 2px solid var(--accent-fg);
+      border-bottom: 2px solid var(--accent-fg);
+      transform: rotate(-45deg) translate(1px, -1px);
+    }
+
+    .opt-content { flex: 1; }
+    .opt-label { font-weight: 500; display: block; font-size: 14px; }
+    .opt-desc { font-size: 12px; color: var(--muted); margin-top: 2px; display: block; line-height: 1.4; }
+
+    /* Nav */
+    .nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 2rem;
+    }
+    .btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 400;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-md);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn:hover { border-color: var(--border-strong); color: var(--text); background: rgba(26,26,24,0.03); }
+    .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+    .btn.primary {
+      background: var(--accent);
+      color: var(--accent-fg);
+      border-color: var(--accent);
+      font-weight: 500;
+    }
+    .btn.primary:hover { background: #333330; border-color: #333330; }
+    .btn.primary:disabled { opacity: 0.3; }
+
+    /* Result */
+    .result-header {
+      padding-bottom: 2rem;
+      margin-bottom: 2rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .result-header h2 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 2rem;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.4rem;
+    }
+    .result-header p { font-size: 14px; color: var(--muted); }
+
+    .r-section { margin-bottom: 2rem; }
+    .r-section-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--hint);
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+    }
+
+    .r-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.1rem 1.25rem;
+      background: var(--surface);
+      margin-bottom: 10px;
+    }
+    .r-card-title { font-weight: 500; font-size: 15px; margin-bottom: 0.4rem; }
+    .r-card-body { font-size: 14px; color: var(--muted); line-height: 1.75; }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 3px 10px;
+      border-radius: 20px;
+      margin-bottom: 8px;
+      letter-spacing: 0.02em;
+    }
+    .badge-green { background: var(--green-bg); color: var(--green-text); }
+    .badge-amber { background: var(--amber-bg); color: var(--amber-text); }
+    .badge-blue { background: var(--blue-bg); color: var(--blue-text); }
+    .badge-red { background: var(--red-bg); color: var(--red-text); }
+
+    .pill-row { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .pill {
+      font-size: 12px;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 10px;
+      color: var(--muted);
+      background: var(--bg);
+    }
+
+    .accent-card {
+      border-left: 2px solid var(--accent);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      padding: 1rem 1.25rem;
+      background: var(--surface);
+      margin-bottom: 10px;
+      border-top: 1px solid var(--border);
+      border-right: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .accent-card .r-card-title { font-size: 14px; }
+
+    .divider { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+
+    .restart-btn {
+      font-family: 'DM Sans', sans-serif;
+      font-size: 14px;
+      color: var(--muted);
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 10px 18px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .restart-btn:hover { color: var(--text); border-color: var(--border-md); }
+
+    /* Fade in animation */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp 0.3s ease both; }
+
+    /* Mobile */
+    @media (max-width: 480px) {
+      .page { padding: 2rem 1rem 5rem; }
+      .quiz-intro h1 { font-size: 1.75rem; }
+      .step-q { font-size: 1.25rem; }
+      .site-header { padding: 1rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+
+<header class="site-header">
+  <span class="brand">Hairmaxxing</span>
+  <span class="module-tag">Questionnaire capillaire</span>
+</header>
+
+<main class="page">
+  <div id="app"></div>
+</main>
+
+<script>
+const questions = [
+  {
+    id: 'norwood',
+    title: 'Quel est ton pattern de perte de cheveux ?',
+    sub: 'Si tu n\'es pas sûr, choisis l\'option qui te ressemble le plus.',
+    type: 'single',
+    options: [
+      { value: 'none', label: 'Aucune perte visible', desc: 'Cheveux denses, pas de zone dégarnie' },
+      { value: 'diffuse', label: 'Perte diffuse', desc: 'Amincissement général sur tout le crâne, sans zone précise' },
+      { value: 'temporal', label: 'Recul temporal (Norwood 2–3)', desc: 'Recul au niveau des tempes, le reste est dense' },
+      { value: 'crown', label: 'Zone du sommet (couronne)', desc: 'Clairsemé ou chauve au sommet, tempes encore présentes' },
+      { value: 'combined', label: 'Temporales + sommet (Norwood 4+)', desc: 'Recul des tempes ET amincissement du sommet' },
+      { value: 'advanced', label: 'Avancé (Norwood 6–7)', desc: 'Large zone dégagée, peu de cheveux restants' },
+    ]
+  },
+  {
+    id: 'density',
+    title: 'Comment décris-tu la densité de tes cheveux ?',
+    type: 'single',
+    options: [
+      { value: 'high', label: 'Dense', desc: 'Beaucoup de cheveux, cuir chevelu non visible' },
+      { value: 'medium', label: 'Moyenne', desc: 'Cuir chevelu visible en mouillant ou en éclairage direct' },
+      { value: 'low', label: 'Clairsemé', desc: 'Cuir chevelu clairement visible à sec' },
+    ]
+  },
+  {
+    id: 'texture',
+    title: 'Quelle est la texture naturelle de tes cheveux ?',
+    type: 'single',
+    options: [
+      { value: 'straight', label: 'Raides / lisses' },
+      { value: 'wavy', label: 'Ondulés' },
+      { value: 'curly', label: 'Bouclés' },
+      { value: 'coily', label: 'Très frisés / crépus' },
+    ]
+  },
+  {
+    id: 'thickness',
+    title: 'Quel est le diamètre de chaque tige ?',
+    sub: 'Compare une tige à un fil de couture pour t\'orienter.',
+    type: 'single',
+    options: [
+      { value: 'fine', label: 'Fins', desc: 'Plus fin qu\'un fil de couture' },
+      { value: 'medium', label: 'Moyens', desc: 'À peu près comme un fil de couture' },
+      { value: 'thick', label: 'Épais / grossiers', desc: 'Plus épais qu\'un fil de couture' },
+    ]
+  },
+  {
+    id: 'balance',
+    title: 'Test de l\'élasticité',
+    sub: 'Prends une tige entre deux doigts, étire-la doucement puis relâche. Que se passe-t\'il ?',
+    type: 'single',
+    options: [
+      { value: 'balanced', label: 'S\'étire puis revient à la normale', desc: 'Bon équilibre hydratation / protéine' },
+      { value: 'gummy', label: 'S\'allonge indéfiniment ou se détache mollement', desc: 'Excès d\'hydratation → manque de protéine' },
+      { value: 'brittle', label: 'Ne s\'étire pas et se casse net', desc: 'Excès de protéine → manque d\'hydratation' },
+      { value: 'unsure', label: 'Je ne sais pas / pas encore testé' },
+    ]
+  },
+  {
+    id: 'scalp',
+    title: 'Comment se porte ton cuir chevelu ?',
+    sub: 'Sélectionne tout ce qui s\'applique.',
+    type: 'multi',
+    options: [
+      { value: 'normal', label: 'Normal, aucun problème particulier' },
+      { value: 'oily', label: 'Gras', desc: 'Sébum visible rapidement après le lavage' },
+      { value: 'dry', label: 'Sec', desc: 'Sensation de tiraillement ou manque de confort' },
+      { value: 'dandruff', label: 'Pellicules', desc: 'Flocons blancs ou jaunes visibles' },
+      { value: 'itch', label: 'Démangeaisons fréquentes' },
+      { value: 'dermatitis', label: 'Dermite séborrhéique (diagnostiquée)' },
+      { value: 'fungal', label: 'Infection fongique (diagnostiquée)' },
+    ]
+  },
+  {
+    id: 'topical',
+    title: 'Utilises-tu des traitements topiques contre la chute ?',
+    sub: 'Minoxidil, finastéride topique, peptides, etc.',
+    type: 'single',
+    options: [
+      { value: 'none', label: 'Non' },
+      { value: 'minoxidil', label: 'Oui — minoxidil (liquide ou mousse)' },
+      { value: 'other', label: 'Oui — autre topique' },
+    ]
+  },
+  {
+    id: 'face',
+    title: 'Quelle est la forme de ton visage ?',
+    sub: 'Cela guidera les conseils de coupe. Observe ton visage face à un miroir.',
+    type: 'single',
+    options: [
+      { value: 'oval', label: 'Ovale', desc: 'Légèrement plus long que large, mâchoire arrondie' },
+      { value: 'round', label: 'Rond', desc: 'Largeur et longueur similaires, joues pleines' },
+      { value: 'square', label: 'Carré', desc: 'Mâchoire marquée, front large' },
+      { value: 'oblong', label: 'Long / rectangulaire', desc: 'Visage nettement plus long que large' },
+      { value: 'heart', label: 'Cœur / triangle inversé', desc: 'Front large, menton pointu' },
+      { value: 'diamond', label: 'Diamant', desc: 'Pommettes larges, front et menton étroits' },
+      { value: 'unknown', label: 'Je ne sais pas' },
+    ]
+  },
+  {
+    id: 'style_goal',
+    title: 'Quel est ton objectif coiffure ?',
+    type: 'single',
+    options: [
+      { value: 'natural', label: 'Naturel et discret', desc: 'Qu\'on ne voit pas d\'effort' },
+      { value: 'volume', label: 'Maximiser le volume', desc: 'Paraître plus dense visuellement' },
+      { value: 'camouflage', label: 'Camoufler la perte', desc: 'Minimiser l\'apparence des zones dégarnies' },
+      { value: 'structured', label: 'Style défini et coiffé', desc: 'Look intentionnel, tenu toute la journée' },
+    ]
+  },
+  {
+    id: 'wash_freq',
+    title: 'À quelle fréquence laves-tu tes cheveux ?',
+    type: 'single',
+    options: [
+      { value: 'daily', label: 'Tous les jours' },
+      { value: 'every2', label: 'Tous les 2 jours' },
+      { value: 'every3', label: 'Tous les 3 jours' },
+      { value: 'weekly', label: '1 fois par semaine ou moins' },
+    ]
+  },
+];
+
+let current = 0;
+let answers = {};
+
+function render() {
+  const app = document.getElementById('app');
+  app.innerHTML = '';
+
+  if (current === -1) {
+    renderIntro(app);
+  } else if (current >= questions.length) {
+    renderResult(app);
+  } else {
+    renderQuestion(app);
+  }
+}
+
+function renderIntro(app) {
+  app.innerHTML = `
+    <div class="quiz-intro fade-up">
+      <h1>Trouve ta routine<br><em>capillaire idéale</em></h1>
+      <p style="margin-bottom:2rem">10 questions pour déterminer le shampoing, l'après-shampoing, les huiles, la coupe et les produits coiffants qui te correspondent vraiment.</p>
+      <button class="btn primary" id="start-btn">Commencer →</button>
+    </div>`;
+  app.querySelector('#start-btn').addEventListener('click', () => { current = 0; render(); });
+}
+
+function renderQuestion(app) {
+  const q = questions[current];
+  const isMulti = q.type === 'multi';
+  const selected = answers[q.id] || (isMulti ? [] : null);
+  const hasAnswer = isMulti ? selected.length > 0 : !!selected;
+
+  // Progress segments
+  const segs = questions.map((_, i) => {
+    let cls = 'progress-seg';
+    if (i < current) cls += ' done';
+    else if (i === current) cls += ' active';
+    return `<div class="${cls}"></div>`;
+  }).join('');
+
+  const optsHtml = q.options.map(o => {
+    const isSel = isMulti ? selected.includes(o.value) : selected === o.value;
+    return `<button class="opt${isMulti ? ' multi' : ''}${isSel ? ' selected' : ''}" data-val="${o.value}">
+      <span class="opt-marker"></span>
+      <span class="opt-content">
+        <span class="opt-label">${o.label}</span>
+        ${o.desc ? `<span class="opt-desc">${o.desc}</span>` : ''}
+      </span>
+    </button>`;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="fade-up">
+      <div class="progress-track">${segs}</div>
+      <div class="step-meta">Question ${current + 1} sur ${questions.length}</div>
+      <div class="step-q">${q.title}</div>
+      ${q.sub ? `<div class="step-sub">${q.sub}</div>` : ''}
+      ${isMulti ? '<div class="multi-hint">Plusieurs réponses possibles</div>' : ''}
+      <div class="options">${optsHtml}</div>
+      <div class="nav">
+        <button class="btn" id="back-btn" ${current === 0 ? 'disabled' : ''}>← Retour</button>
+        <button class="btn primary" id="next-btn" ${!hasAnswer ? 'disabled' : ''}>
+          ${current === questions.length - 1 ? 'Voir mon plan →' : 'Suivant →'}
+        </button>
+      </div>
+    </div>`;
+
+  app.querySelectorAll('.opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const val = btn.dataset.val;
+      if (isMulti) {
+        let arr = [...(answers[q.id] || [])];
+        if (val === 'normal') { arr = arr.includes('normal') ? [] : ['normal']; }
+        else { arr = arr.filter(v => v !== 'normal'); if (arr.includes(val)) arr = arr.filter(v => v !== val); else arr.push(val); }
+        answers[q.id] = arr;
+      } else {
+        answers[q.id] = val;
+      }
+      render();
+    });
+  });
+
+  app.querySelector('#next-btn').addEventListener('click', () => { current++; render(); });
+  app.querySelector('#back-btn').addEventListener('click', () => { if (current > 0) { current--; render(); } });
+}
+
+function renderResult(app) {
+  const a = answers;
+  const norwood = a.norwood || 'none';
+  const density = a.density || 'high';
+  const texture = a.texture || 'straight';
+  const balance = a.balance || 'balanced';
+  const scalp = a.scalp || ['normal'];
+  const topical = a.topical || 'none';
+  const face = a.face || 'oval';
+  const goal = a.style_goal || 'natural';
+  const freq = a.wash_freq || 'every2';
+
+  const hasDandruff = scalp.includes('dandruff');
+  const hasDermatitis = scalp.includes('dermatitis');
+  const hasFungal = scalp.includes('fungal');
+  const hasItch = scalp.includes('itch');
+  const isOily = scalp.includes('oily');
+  const isDry = scalp.includes('dry');
+  const needsDerma = hasDandruff || hasDermatitis || hasFungal;
+  const usesMinoxidil = topical === 'minoxidil';
+  const usesTopical = topical !== 'none';
+
+  // --- SHAMPOING ---
+  let shampooTitle, shampooBody, shampooBadge, shampooPills = [];
+
+  if (needsDerma) {
+    shampooBadge = '<span class="badge badge-red">Consultation dermatologue</span>';
+    shampooTitle = 'Shampoing médicamenteux sur prescription';
+    shampooBody = 'Des pellicules, une dermite séborrhéique ou une infection fongique ont été détectées. Un dermatologue pourra te prescrire le shampoing adapté (kétoconazole, ciclopirox...). Après guérison, reviens à un shampoing doux classique.';
+    shampooPills = ['Kétoconazole 2%', 'Ciclopirox', 'Zinc pyrithione (entretien)'];
+  } else if (isOily) {
+    shampooBadge = '<span class="badge badge-blue">Cuir chevelu gras</span>';
+    shampooTitle = 'Shampoing purifiant léger';
+    shampooBody = 'Privilégie un shampoing purifiant sans silicones ni huiles lourdes. Évite les formules ultra-hydratantes qui peuvent alourdir le cuir chevelu.';
+    shampooPills = ['Sans silicones', 'Sans huiles lourdes', 'Formule courte'];
+  } else if (isDry) {
+    shampooBadge = '<span class="badge badge-amber">Cuir chevelu sec</span>';
+    shampooTitle = 'Shampoing très doux sans sulfates';
+    shampooBody = 'Un shampoing formulé pour cuir chevelu sec, sans sulfates agressifs. Ingrédients à chercher : aloe vera, glycérine, huile de jojoba en faible concentration.';
+    shampooPills = ['Sans sulfates', 'Aloe vera', 'Glycérine', 'Formule courte'];
+  } else {
+    shampooBadge = '<span class="badge badge-green">Cuir chevelu normal</span>';
+    shampooTitle = 'Shampoing doux, formule simple';
+    shampooBody = 'Le moins d\'ingrédients possible. Évite parabènes et silicones. Un shampoing neutre de qualité fera très bien l\'affaire.';
+    shampooPills = ['Sans parabènes', 'Sans silicones', 'Formule courte'];
+  }
+
+  // Sulfates & minoxidil
+  let sulfateNote = '';
+  if (usesMinoxidil) {
+    sulfateNote = ' <strong>Tu utilises du minoxidil</strong> : un shampoing aux sulfates 1x/semaine (ou tous les 10 jours) est utile pour éliminer les résidus du topique et éviter l\'accumulation sur le cuir chevelu.';
+    shampooPills.push('Sulfates 1×/sem (résidus minoxidil)');
+  } else if (usesTopical) {
+    sulfateNote = ' Avec un traitement topique, un lavage aux sulfates occasionnel peut aider à nettoyer les résidus.';
+  }
+  if (freq === 'daily') sulfateNote += ' Tu laves quotidiennement : réserve les sulfates pour un nettoyage intensif hebdo si nécessaire — ils ne sont pas adaptés à un usage quotidien.';
+  if (freq === 'weekly') sulfateNote += ' Tu laves rarement : à chaque lavage, un shampoing légèrement plus nettoyant peut être approprié.';
+
+  // --- APRÈS-SHAMPOING ---
+  let condTitle, condBody, condBadge, condPills = [];
+
+  if (balance === 'gummy') {
+    condBadge = '<span class="badge badge-amber">Manque de protéine</span>';
+    condTitle = 'Après-shampoing riche en protéines';
+    condBody = 'Tes cheveux s\'allongent indéfiniment sans revenir à leur forme — signe d\'un excès d\'hydratation et d\'un manque de protéine. Choisis un après-shampoing riche en protéines hydrolysées. Applique <strong>uniquement sur les tiges</strong>, jamais sur le cuir chevelu. Laisse poser 2–3 min avant de rincer.';
+    condPills = ['Kératine hydrolysée', 'Protéine de soie', 'Collagène', 'Protéine de blé'];
+  } else if (balance === 'brittle') {
+    condBadge = '<span class="badge badge-amber">Manque d\'hydratation</span>';
+    condTitle = 'Après-shampoing intensément hydratant';
+    condBody = 'Tes cheveux se cassent sans s\'étirer — excès de protéine et manque d\'hydratation. Choisis un après-shampoing hydratant, sans protéines ajoutées pour l\'instant. Applique <strong>uniquement sur les tiges</strong>, laisse poser 2–3 min, rince à l\'eau tiède.';
+    condPills = ['Aloe vera', 'Glycérine', 'Acide hyaluronique', 'Beurre de karité léger'];
+  } else {
+    condBadge = '<span class="badge badge-green">Bon équilibre</span>';
+    condTitle = 'Après-shampoing équilibré classique';
+    condBody = 'Ton équilibre hydratation/protéine est bon. Un après-shampoing classique sans excès suffit. Applique <strong>uniquement sur les tiges</strong>, jamais sur le cuir chevelu. Laisse poser 2–3 min.';
+    condPills = ['Aloe vera', 'Kératine légère', 'Sans silicones lourds'];
+  }
+
+  // --- MASQUE ---
+  let maskHtml = '';
+  if (balance === 'gummy' || balance === 'brittle' || isDry || hasItch || hasDandruff) {
+    let maskBadge, maskTitle, maskBody, maskPills = [], maskFreq;
+
+    if (balance === 'gummy') {
+      maskBadge = '<span class="badge badge-blue">Masque protéinant</span>';
+      maskTitle = 'Masque à l\'huile de coco';
+      maskBody = 'L\'huile de coco pénètre la tige et apporte de la protéine. Applique sur les tiges, laisse poser 30 min avant le shampoing.';
+      maskPills = ['Huile de coco vierge'];
+      maskFreq = '1× toutes les 2 semaines';
+    } else if (balance === 'brittle' || isDry) {
+      maskBadge = '<span class="badge badge-blue">Masque hydratant</span>';
+      maskTitle = 'Masque à l\'huile de jojoba + aloe vera';
+      maskBody = 'L\'huile de jojoba imite le sébum naturel et l\'aloe vera hydrate en profondeur. Applique sur les tiges, laisse poser 20–30 min.';
+      maskPills = ['Huile de jojoba', 'Gel d\'aloe vera pur'];
+      maskFreq = '1× par semaine';
+    } else {
+      maskBadge = '<span class="badge badge-blue">Masque apaisant</span>';
+      maskTitle = 'Masque cuir chevelu';
+      maskBody = 'Pour calmer les démangeaisons et prévenir l\'inflammation.';
+      maskPills = [];
+      maskFreq = '1× par semaine';
+    }
+
+    if (hasItch || hasDandruff) {
+      maskBody += ' Ajoute <strong>2–3 gouttes</strong> d\'huile essentielle d\'arbre à thé ou de menthe poivrée diluées dans l\'huile de support, à appliquer <strong>sur le cuir chevelu uniquement</strong>.';
+      maskPills.push('HE arbre à thé (2–3 gouttes)', 'HE menthe poivrée (2–3 gouttes)');
+    }
+
+    maskHtml = `<div class="r-section">
+      <div class="r-section-label">Masque capillaire</div>
+      <div class="r-card">
+        ${maskBadge}
+        <div class="r-card-title">${maskTitle} — ${maskFreq}</div>
+        <div class="r-card-body">${maskBody}<div class="pill-row">${maskPills.map(p=>`<span class="pill">${p}</span>`).join('')}</div></div>
+      </div>
+    </div>`;
+  }
+
+  // --- COUPE ---
+  const faceMap = { oval:'Visage ovale', round:'Visage rond', square:'Visage carré', oblong:'Visage long / rectangulaire', heart:'Visage cœur', diamond:'Visage diamant', unknown:'Forme non précisée' };
+  const cutByFace = {
+    oval: 'La plupart des coupes te conviennent — profite de cette flexibilité pour te concentrer sur ce que tu veux camoufler ou accentuer.',
+    round: 'Privilégie les coupes qui allongent le visage : du volume sur le dessus, côtés courts (undercut, fade). Évite les frangettes courtes qui renforcent l\'impression de rondeur.',
+    square: 'Ta mâchoire marquée est un atout. Volume sur le dessus, côtés fondus en douceur (fade léger). Évite de couper le dessus trop ras.',
+    oblong: 'Évite les coupes qui allongent encore (trop de hauteur). Volume sur les côtés ou longueur uniforme pour équilibrer.',
+    heart: 'Ajoute du volume au niveau de la mâchoire pour équilibrer le front large. Côtés légèrement plus fournis, dessus plus court.',
+    diamond: 'Volume au niveau du front et du menton pour équilibrer les pommettes. Les coupes texturées fonctionnent très bien.',
+    unknown: 'Sans connaître ta forme de visage, difficile de guider précisément. Un bon coiffeur saura immédiatement quelle coupe te conviendra.',
+  };
+  const cutByNorwood = {
+    none: 'Sans perte, tu peux choisir librement selon tes préférences.',
+    diffuse: 'Avec une perte diffuse, les coupes courtes et uniformes (buzz cut, crew cut) minimisent l\'amincissement global. Les coupes longues sur des cheveux fins rendent la perte plus visible.',
+    temporal: 'Recul temporal : un mid fade ou un undercut crée une transition douce sans accentuer les tempes. Du volume texturé sur le dessus compense visuellement.',
+    crown: 'Sommet clairsemé : une coupe courte et texturée sur le dessus (crop, Caesar) est bien plus flatteuse qu\'une chevelure longue et fine. Évite absolument le combover.',
+    combined: 'Temporales + sommet : les coupes courtes à mi-longues texturées (crop top, buzz cut léger) sont tes meilleures options. Les produits de camouflage peuvent compléter efficacement.',
+    advanced: 'À un stade avancé, un rasage propre ou un buzz très court est souvent l\'option la plus esthétique et la plus confiante. Les produits de camouflage peuvent aider si tu conserves des cheveux.',
+  };
+
+  // --- PRODUITS COIFFANTS ---
+  const textureTips = {
+    straight: 'Pour cheveux raides, une argile ou cire matifiante légère donne du contrôle sans coller.',
+    wavy: 'Pour ondulés, un gel léger ou une crème coiffante texturisante accentue le mouvement naturel.',
+    curly: 'Pour bouclés, un gel ou mousse légère sans résidu gras préserve la forme.',
+    coily: 'Pour très frisés, un gel ou soufflé léger définit sans alourdir.',
+  };
+
+  let stylingBody = `Règle absolue : <strong>aucun rendu gras, mouillé ou qui colle les tiges ensemble</strong> — cela accentue la clairsemance. Opte pour matte, texturé, coiffé-décoiffé ou volumateur. ${textureTips[texture] || ''}`;
+  let stylingPills = [];
+  let camoHtml = '';
+
+  if (goal === 'volume') {
+    stylingPills = ['Argile matifiante légère', 'Sea salt spray', 'Mousse volumatrice', 'Poudre volumatrice racines'];
+    stylingBody += ' Applique sur cheveux légèrement humides, travaille de la racine vers les pointes pour maximiser le volume.';
+  } else if (goal === 'camouflage') {
+    stylingPills = ['Argile matte légère', 'Spray texture matifiant'];
+    camoHtml = `<div class="accent-card">
+      <div class="r-card-title">Camouflage — Dermmatch</div>
+      <div class="r-card-body">Pour augmenter la densité visuelle, le <strong>Dermmatch</strong> est supérieur aux poudres classiques : waterproof, résistant au vent et à la transpiration, effet densifiant et coiffant simultané. Une boîte dure plusieurs mois. Les poudres populaires (Toppik, etc.) fonctionnent mais restent sensibles à la pluie et au vent.</div>
+    </div>`;
+  } else if (goal === 'structured') {
+    stylingPills = ['Cire légère matte', 'Pomade à l\'eau (finish mat)', 'Argile texturisante'];
+    stylingBody += ' Applique sur cheveux secs pour plus de contrôle et de tenue toute la journée.';
+  } else {
+    stylingPills = ['Argile légère matte', 'Crème coiffante légère', 'Sea salt spray'];
+    stylingBody += ' Applique une très petite quantité pour un rendu naturel sans résidu visible.';
+  }
+
+  app.innerHTML = `<div class="fade-up">
+    <div class="result-header">
+      <h2>Ton plan capillaire</h2>
+      <p>Basé sur tes réponses — module Hairmaxxing</p>
+    </div>
+
+    <div class="r-section">
+      <div class="r-section-label">Shampoing</div>
+      <div class="r-card">
+        ${shampooBadge}
+        <div class="r-card-title">${shampooTitle}</div>
+        <div class="r-card-body">${shampooBody}${sulfateNote ? '<br><br>' + sulfateNote : ''}<div class="pill-row">${shampooPills.map(p=>`<span class="pill">${p}</span>`).join('')}</div></div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <div class="r-section-label">Après-shampoing</div>
+      <div class="r-card">
+        ${condBadge}
+        <div class="r-card-title">${condTitle}</div>
+        <div class="r-card-body">${condBody}<div class="pill-row">${condPills.map(p=>`<span class="pill">${p}</span>`).join('')}</div></div>
+      </div>
+    </div>
+
+    ${maskHtml}
+
+    <div class="r-section">
+      <div class="r-section-label">Coupe de cheveux</div>
+      <div class="r-card">
+        <span class="badge badge-blue">${faceMap[face] || ''}</span>
+        <div class="r-card-body" style="margin-top:4px">
+          ${cutByFace[face] || ''} ${cutByNorwood[norwood] || ''}
+          <br><br>
+          <span style="font-size:13px;color:var(--hint)">Conseil clé : confie-toi à un coiffeur spécialisé en cheveux fins ou dégarnis — il saura lire ta situation mieux que n'importe quel guide.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="r-section">
+      <div class="r-section-label">Produits coiffants</div>
+      <div class="r-card">
+        <div class="r-card-body">${stylingBody}<div class="pill-row">${stylingPills.map(p=>`<span class="pill">${p}</span>`).join('')}</div></div>
+      </div>
+      ${camoHtml}
+    </div>
+
+    <hr class="divider">
+    <button class="restart-btn" id="restart-btn">← Recommencer le questionnaire</button>
+  </div>`;
+
+  app.querySelector('#restart-btn').addEventListener('click', () => { current = 0; answers = {}; render(); });
+}
+
+// Start on intro
+current = -1;
+render();
+</script>
+</body>
+</html>
